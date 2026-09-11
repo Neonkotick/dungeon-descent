@@ -14,8 +14,18 @@ export class MainMenuScene extends Phaser.Scene {
 
     this.add.rectangle(width / 2, height / 2, width, height, 0x0a0a0f);
 
+    if (this.textures.exists('player')) {
+      this.add.image(48, 200, 'player').setScale(1.2).setAlpha(0.9);
+    }
+    if (this.textures.exists('enemy_skeleton')) {
+      this.add.image(width - 48, 100, 'enemy_skeleton').setScale(1.0).setAlpha(0.85);
+    }
+    if (this.textures.exists('enemy_boss')) {
+      this.add.image(width - 52, 200, 'enemy_boss').setScale(0.7).setAlpha(0.7);
+    }
+
     this.add
-      .text(width / 2, 50, 'DUNGEON', {
+      .text(width / 2, 42, 'DUNGEON', {
         fontFamily: 'monospace',
         fontSize: '28px',
         color: '#c9a227',
@@ -24,7 +34,7 @@ export class MainMenuScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(width / 2, 78, 'DESCENT', {
+      .text(width / 2, 68, 'DESCENT', {
         fontFamily: 'monospace',
         fontSize: '22px',
         color: '#8b6914',
@@ -32,7 +42,7 @@ export class MainMenuScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(width / 2, 100, 'Enter the dungeon.', {
+      .text(width / 2, 90, 'Enter the dungeon.', {
         fontFamily: 'monospace',
         fontSize: '10px',
         color: '#666688',
@@ -42,7 +52,7 @@ export class MainMenuScene extends Phaser.Scene {
     const meta = saveManager.loadMeta();
 
     this.add
-      .text(width / 2, 120, `Best Floor: ${meta.bestFloor}`, {
+      .text(width / 2, 108, `Best Floor: ${meta.bestFloor}`, {
         fontFamily: 'monospace',
         fontSize: '11px',
         color: '#8888aa',
@@ -50,16 +60,16 @@ export class MainMenuScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(width / 2, 134, `Soul Shards: ${meta.soulShards}`, {
+      .text(width / 2, 122, `Soul Shards: ${meta.soulShards}`, {
         fontFamily: 'monospace',
         fontSize: '10px',
         color: '#9b59b6',
       })
       .setOrigin(0.5);
 
-    this.createButton(width / 2, 170, 'START RUN', () => this.startRun());
-    this.createButton(width / 2, 205, 'UPGRADES', () => this.showUpgrades());
-    this.createButton(width / 2, 240, 'CODEX', () => {
+    this.createButton(width / 2, 155, 'START RUN', () => this.startRun());
+    this.createButton(width / 2, 188, 'UPGRADES', () => this.showUpgrades());
+    this.createButton(width / 2, 221, 'CODEX', () => {
       TelegramService.showAlert('Codex coming in v0.2');
     });
 

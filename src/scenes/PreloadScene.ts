@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { PIXEL_ASSETS } from '../data/pixelAssets';
 
 export class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -8,7 +9,7 @@ export class PreloadScene extends Phaser.Scene {
   preload(): void {
     const { width, height } = this.cameras.main;
 
-    const barBg = this.add.rectangle(width / 2, height / 2, 200, 12, 0x333344);
+    this.add.rectangle(width / 2, height / 2, 200, 12, 0x333344);
     const bar = this.add.rectangle(width / 2 - 98, height / 2, 4, 8, 0xc9a227).setOrigin(0, 0.5);
     this.add
       .text(width / 2, height / 2 - 20, 'Loading...', {
@@ -22,47 +23,20 @@ export class PreloadScene extends Phaser.Scene {
       bar.width = 4 + 192 * value;
     });
 
-    // Pixel art sprites (dark fantasy)
-    this.load.image('player', 'assets/sprites/player.png');
-    this.load.image('enemy_rat', 'assets/sprites/enemy_rat.png');
-    this.load.image('enemy_skeleton', 'assets/sprites/enemy_skeleton.png');
-    this.load.image('enemy_archer', 'assets/sprites/enemy_archer.png');
-    this.load.image('enemy_cultist', 'assets/sprites/enemy_cultist.png');
-    this.load.image('enemy_brute', 'assets/sprites/enemy_brute.png');
-    this.load.image('enemy_mage', 'assets/sprites/enemy_mage.png');
-    this.load.image('enemy_knight', 'assets/sprites/enemy_knight.png');
-    this.load.image('enemy_zombie', 'assets/sprites/enemy_zombie.png');
-    this.load.image('enemy_boss', 'assets/sprites/enemy_boss.png');
-    this.load.image('tile_floor', 'assets/sprites/tile_floor.png');
-
-    // UI
-    this.load.image('ui_button', 'assets/ui/button.png');
-    this.load.image('ui_panel', 'assets/ui/panel.png');
-    this.load.image('ui_hp', 'assets/ui/hp_fill.png');
-    this.load.image('ui_mp', 'assets/ui/mp_fill.png');
-
-    // Icons
-    this.load.image('icon_sword', 'assets/icons/sword.png');
-    this.load.image('icon_potion', 'assets/icons/potion.png');
-    this.load.image('icon_chest', 'assets/icons/chest.png');
-    this.load.image('icon_coin', 'assets/icons/coin.png');
-
-    this.load.on('loaderror', (file: Phaser.Loader.File) => {
-      console.warn('[Preload] Failed to load', file.key, '— using procedural fallback');
-    });
+    // Embedded dark-fantasy pixel art (data URIs — self-contained)
+    for (const [key, dataUri] of Object.entries(PIXEL_ASSETS)) {
+      this.load.image(key, dataUri);
+    }
   }
 
   create(): void {
-    this.ensureFallback('player', 0x3a5f8a);
-    this.ensureFallback('enemy_rat', 0x8b7355);
-    this.ensureFallback('enemy_skeleton', 0xc0c0c0);
-    this.ensureFallback('enemy_archer', 0x6b8e23);
-    this.ensureFallback('enemy_cultist', 0x4b0082);
-    this.ensureFallback('enemy_brute', 0x228b22);
-    this.ensureFallback('enemy_mage', 0x9370db);
-    this.ensureFallback('enemy_knight', 0xa9a9a9);
-    this.ensureFallback('enemy_zombie', 0x4682b4);
-    this.ensureFallback('enemy_boss', 0x708090);
+    const required = [
+      'player', 'enemy_rat', 'enemy_skeleton', 'enemy_archer', 'enemy_cultist',
+      'enemy_brute', 'enemy_mage', 'enemy_knight', 'enemy_zombie', 'enemy_boss',
+    ];
+    for (const key of required) {
+      this.ensureFallback(key, this.fallbackColor(key));
+    }
 
     if (!this.textures.exists('particle')) {
       const pt = this.make.graphics({ x: 0, y: 0 });
@@ -82,6 +56,22 @@ export class PreloadScene extends Phaser.Scene {
     }
 
     this.scene.start('MainMenuScene');
+  }
+
+  private fallbackColor(key: string): number {
+    const map: Record<string, number> = {
+      player: 0x3a5f8a,
+      enemy_rat: 0x8b7355,
+      enemy_skeleton: 0xc0c0c0,
+      enemy_archer: 0x6b8e23,
+      enemy_cultist: 0x4b0082,
+      enemy_brute: 0x228b22,
+      enemy_mage: 0x9370db,
+      enemy_knight: 0xa9a9a9,
+      enemy_zombie: 0x4682b4,
+      enemy_boss: 0x708090,
+    };
+    return map[key] ?? 0x555555;
   }
 
   private ensureFallback(key: string, color: number): void {

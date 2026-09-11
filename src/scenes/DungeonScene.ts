@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { SoundManager } from '../audio/SoundManager';
 import type { GameState, RoomChoice, RoomType } from '../save/SaveManager';
 import { saveManager } from '../save/SaveManager';
 import { generateFloor, getRoomChoices, getEnemyIdsForRoom, type DungeonFloor } from '../dungeon/DungeonGenerator';
@@ -23,6 +24,7 @@ export class DungeonScene extends Phaser.Scene {
   }
 
   create(): void {
+    SoundManager.unlock();
     const { width, height } = this.cameras.main;
     TelegramService.showBackButton(() => {
       saveManager.saveRun(this.state);
@@ -49,6 +51,7 @@ export class DungeonScene extends Phaser.Scene {
     this.choiceContainer = this.add.container(0, 0);
 
     this.createSmallButton(width - 50, height - 20, 'INV', () => {
+      SoundManager.play('click');
       saveManager.saveRun(this.state);
       this.scene.start('InventoryScene', { state: this.state, returnScene: 'DungeonScene' });
     });
@@ -77,12 +80,14 @@ export class DungeonScene extends Phaser.Scene {
       for (const item of loot) {
         this.state.inventory.push(item);
         this.state.runStats.itemsFound += 1;
+        SoundManager.play('loot');
       }
       const bossGold = 50 + this.state.currentFloor * 20;
       this.state.gold += bossGold;
       this.state.runStats.goldEarned += bossGold;
       this.floorData.rooms[this.floorData.currentIndex].completed = true;
       saveManager.saveRun(this.state);
+      SoundManager.play('victory');
       this.showMessage(`Boss defeated! +${bossGold} gold & rare loot`, () => this.goNextFloor());
     } else {
       this.floorData.rooms[this.floorData.currentIndex].completed = true;
@@ -101,9 +106,9 @@ export class DungeonScene extends Phaser.Scene {
     this.state.currentRoomIndex = room.index;
 
     const titles: Record<RoomType, string> = {
-      combat: '⚔ Combat Room', elite: '☠ Elite Encounter', treasure: '💰 Treasure Chamber',
-      event: '? Strange Event', rest: '🏕️ Rest Site', shop: '🛒 Merchant',
-      secret: '✦ Hidden Room', boss: '👑 BOSS ROOM',
+      combat: '\u2694 Combat Room', elite: '\u2620 Elite Encounter', treasure: '\ud83d\udcb0 Treasure Chamber',
+      event: '? Strange Event', rest: '\ud83c\udfd5 Rest Site', shop: '\ud83d\uded2 Merchant',
+      secret: '\u2726 Hidden Room', boss: '\ud83d\udc51 BOSS ROOM',
     };
     this.choiceContainer.add(
       this.add.text(width / 2, 70, titles[room.type] || room.type, {
@@ -120,6 +125,7 @@ export class DungeonScene extends Phaser.Scene {
 
   private enterRoom(type: RoomType): void {
     TelegramService.haptic('medium');
+    SoundManager.play('step');
     const room = this.floorData.rooms[this.floorData.currentIndex];
     switch (type) {
       case 'combat': case 'elite': case 'boss': {
@@ -137,17 +143,20 @@ export class DungeonScene extends Phaser.Scene {
   }
 
   private doTreasure(): void {
+    SoundManager.play('chest');
     const item = generateItem(this.state.currentFloor);
     this.state.inventory.push(item);
     this.state.runStats.itemsFound += 1;
+    SoundManager.play('loot');
     this.showLootPopup(item.name, item.rarity, () => this.completeRoom());
   }
 
   private doRest(): void {
-    const heal = Math.floor(this.state.player.stats.maxHp * 0.4);
+    const heal = Math.floor(this.state.player.stats.maxHp * 0.5);
     this.state.player.stats.hp = Math.min(this.state.player.stats.maxHp, this.state.player.stats.hp + heal);
     this.state.player.stats.mp = Math.min(this.state.player.stats.maxMp, this.state.player.stats.mp + 10);
     this.statusText.setText(this.getStatusLine());
+    SoundManager.play('rest');
     this.showMessage(`Rested. +${heal} HP, +10 MP`, () => this.completeRoom());
   }
 
@@ -155,6 +164,7 @@ export class DungeonScene extends Phaser.Scene {
     if (this.state.gold >= 25) {
       this.state.gold -= 25;
       this.state.consumables.potion += 1;
+      SoundManager.play('click');
       this.showMessage('Bought a Potion for 25 gold', () => this.completeRoom());
     } else {
       this.showMessage('Not enough gold for potion (25)', () => this.completeRoom());
@@ -167,15 +177,19 @@ export class DungeonScene extends Phaser.Scene {
       const gold = 15 + Math.floor(Math.random() * 20);
       this.state.gold += gold;
       this.state.runStats.goldEarned += gold;
+      SoundManager.play('loot');
       this.showMessage(`Found a hidden stash: +${gold} gold`, () => this.completeRoom());
     } else if (roll < 0.7) {
       const dmg = 8 + Math.floor(Math.random() * 12);
       this.state.player.stats.hp = Math.max(1, this.state.player.stats.hp - dmg);
       this.statusText.setText(this.getStatusLine());
+      SoundManager.play('hit');
       this.showMessage(`Trap! Took ${dmg} damage`, () => this.completeRoom());
     } else {
+      SoundManager.play('chest');
       const item = generateItem(this.state.currentFloor, 'uncommon');
       this.state.inventory.push(item);
+      SoundManager.play('loot');
       this.showLootPopup(item.name, item.rarity, () => this.completeRoom());
     }
   }
@@ -206,6 +220,7 @@ export class DungeonScene extends Phaser.Scene {
   }
 
   private selectRoom(choice: RoomChoice): void {
+    SoundManager.play('step');
     const nextIdx = this.floorData.currentIndex + 1;
     if (nextIdx < this.floorData.rooms.length) {
       this.floorData.rooms[nextIdx].type = choice.type;
@@ -232,7 +247,11 @@ export class DungeonScene extends Phaser.Scene {
       fontFamily: 'monospace', fontSize: '12px', color: '#e0d0b0',
     }).setOrigin(0.5);
     container.add([bg, text]);
-    bg.on('pointerdown', () => { TelegramService.haptic('light'); cb(); });
+    bg.on('pointerdown', () => {
+      SoundManager.play('click');
+      TelegramService.haptic('light');
+      cb();
+    });
     return container;
   }
 
@@ -240,7 +259,7 @@ export class DungeonScene extends Phaser.Scene {
     const bg = this.add.rectangle(x, y, 40, 20, 0x333344).setInteractive({ useHandCursor: true });
     bg.setStrokeStyle(1, 0x666688);
     this.add.text(x, y, label, { fontFamily: 'monospace', fontSize: '9px', color: '#aaaacc' }).setOrigin(0.5);
-    bg.on('pointerdown', cb);
+    bg.on('pointerdown', () => { SoundManager.play('click'); cb(); });
   }
 
   private showMessage(msg: string, onClose: () => void): void {

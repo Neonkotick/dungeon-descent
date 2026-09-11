@@ -39,6 +39,7 @@ export class BattleScene extends Phaser.Scene {
 
   create(): void {
     this.cameras.main.setBackgroundColor(0x0d0d18);
+    this.cameras.main.fadeIn(220, 0, 0, 0);
     this.fx = new BattleFX(this);
     this.juice = new SpriteJuice(this);
     SoundManager.unlock();

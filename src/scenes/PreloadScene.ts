@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { PIXEL_ASSETS } from '../data/pixelAssets';
+import { generateCombatSprites } from '../fx/ProceduralArt';
 
 export class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -23,7 +24,6 @@ export class PreloadScene extends Phaser.Scene {
       bar.width = 4 + 192 * value;
     });
 
-    // Embedded dark-fantasy pixel art (data URIs — self-contained)
     for (const [key, dataUri] of Object.entries(PIXEL_ASSETS)) {
       this.load.image(key, dataUri);
     }
@@ -54,6 +54,8 @@ export class PreloadScene extends Phaser.Scene {
       btn.generateTexture('btn', 120, 28);
       btn.destroy();
     }
+
+    generateCombatSprites(this);
 
     this.scene.start('MainMenuScene');
   }

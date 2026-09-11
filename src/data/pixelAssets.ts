@@ -1,7 +1,12 @@
-/** Auto-generated pixel art as data URIs — dark fantasy style */
+/** Dark fantasy pixel art - merged packs */
+import { PACK_0 } from './pixelAssets_0';
+import { PACK_1 } from './pixelAssets_1';
+import { PACK_2 } from './pixelAssets_2';
+import { PACK_3 } from './pixelAssets_3';
 
 export const PIXEL_ASSETS: Record<string, string> = {
-  'icon_chest': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAnUlEQVRoge3XwQnAIBBE0d0S7H9LswQLsIRlkYMYhAgS8ubB/zDw2VnGYrFYLBaLxWKxWCwWi8VisVgsFovFYrFYLBaLxWKxWCwWi8VisVgsFovFYrFYLBaLxWKxWCwWi8VisVgsFovFYrFYLBaLxWKxWCwWi8VisVgsFovFYrFYLBaLxWKxWCwWi8VisVgsFovFYrFYLBaLxWKxWCwWi8VisVgsFovFYrFYLBaLxWKxWCwWi8VisVgsFovFYrFYLBZ/8gF3YQe3nQAAAABJRU5ErkJggg==',
-  'icon_coin': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAYAAAByDd+UAAAAhUlEQVRIie3VwQnAIAxG4b+B7n9LZwgO0CGcgwM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gIM4gP8BvgE7RQO3nQAAAABJRU5ErkJggg==',
-  'player': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAsElEQVR4nO3dwQ2AIBBF0d0S7H9LswQLsIRlkYMYhAgS8ubB/zDw2VnGYrFYLBaLxWKxWCwWi8VisVgsFovFYrFYLBaLxWKxWCwWi8VisVgsFovFYrFYLBaLxWKxWCwWi8VisVgsFovFYrFYLBaLxWKxWCwWi8VisVgsFovFYrFYLBaLxWKxWCwWi8VisVgsFovFYrFYLBaLxWKxWCwWi8VisVgsFovFYrFYLBaLxWKxWCwWi8VisVgsFovFYrFYLBZ/8gF3YQe3nQAAAABJRU5ErkJggg==',
+  ...PACK_0,
+  ...PACK_1,
+  ...PACK_2,
+  ...PACK_3,
 };

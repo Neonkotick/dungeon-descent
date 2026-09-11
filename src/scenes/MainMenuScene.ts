@@ -15,6 +15,13 @@ export class MainMenuScene extends Phaser.Scene {
     TelegramService.hideMainButton();
 
     this.add.rectangle(width / 2, height / 2, width, height, 0x0a0a0f);
+    for (let i = 0; i < 6; i++) {
+      const e = this.add.circle(40 + Math.random() * 400, 30 + Math.random() * 200, 1.2, 0xff6622, 0.4);
+      this.tweens.add({
+        targets: e, y: e.y - 30, alpha: 0, duration: 2500, repeat: -1, delay: i * 300,
+        onRepeat: () => { e.y = 40 + Math.random() * 180; e.x = 40 + Math.random() * 400; e.alpha = 0.4; },
+      });
+    }
 
     if (this.textures.exists('player')) {
       this.add.image(48, 200, 'player').setScale(1.2).setAlpha(0.9);

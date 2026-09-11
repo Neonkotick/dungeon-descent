@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { SoundManager } from '../audio/SoundManager';
 import { saveManager, createNewRunState } from '../save/SaveManager';
 import { TelegramService } from '../telegram/TelegramService';
 
@@ -8,6 +9,7 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   create(): void {
+    SoundManager.unlock();
     const { width, height } = this.cameras.main;
     TelegramService.hideBackButton();
     TelegramService.hideMainButton();
@@ -24,48 +26,27 @@ export class MainMenuScene extends Phaser.Scene {
       this.add.image(width - 52, 200, 'enemy_boss').setScale(0.7).setAlpha(0.7);
     }
 
-    this.add
-      .text(width / 2, 42, 'DUNGEON', {
-        fontFamily: 'monospace',
-        fontSize: '28px',
-        color: '#c9a227',
-        fontStyle: 'bold',
-      })
-      .setOrigin(0.5);
+    this.add.text(width / 2, 42, 'DUNGEON', {
+      fontFamily: 'monospace', fontSize: '28px', color: '#c9a227', fontStyle: 'bold',
+    }).setOrigin(0.5);
 
-    this.add
-      .text(width / 2, 68, 'DESCENT', {
-        fontFamily: 'monospace',
-        fontSize: '22px',
-        color: '#8b6914',
-      })
-      .setOrigin(0.5);
+    this.add.text(width / 2, 68, 'DESCENT', {
+      fontFamily: 'monospace', fontSize: '22px', color: '#8b6914',
+    }).setOrigin(0.5);
 
-    this.add
-      .text(width / 2, 90, 'Enter the dungeon.', {
-        fontFamily: 'monospace',
-        fontSize: '10px',
-        color: '#666688',
-      })
-      .setOrigin(0.5);
+    this.add.text(width / 2, 90, 'Enter the dungeon.', {
+      fontFamily: 'monospace', fontSize: '10px', color: '#666688',
+    }).setOrigin(0.5);
 
     const meta = saveManager.loadMeta();
 
-    this.add
-      .text(width / 2, 108, `Best Floor: ${meta.bestFloor}`, {
-        fontFamily: 'monospace',
-        fontSize: '11px',
-        color: '#8888aa',
-      })
-      .setOrigin(0.5);
+    this.add.text(width / 2, 108, `Best Floor: ${meta.bestFloor}`, {
+      fontFamily: 'monospace', fontSize: '11px', color: '#8888aa',
+    }).setOrigin(0.5);
 
-    this.add
-      .text(width / 2, 122, `Soul Shards: ${meta.soulShards}`, {
-        fontFamily: 'monospace',
-        fontSize: '10px',
-        color: '#9b59b6',
-      })
-      .setOrigin(0.5);
+    this.add.text(width / 2, 122, `Soul Shards: ${meta.soulShards}`, {
+      fontFamily: 'monospace', fontSize: '10px', color: '#9b59b6',
+    }).setOrigin(0.5);
 
     this.createButton(width / 2, 155, 'START RUN', () => this.startRun());
     this.createButton(width / 2, 188, 'UPGRADES', () => this.showUpgrades());
@@ -84,15 +65,12 @@ export class MainMenuScene extends Phaser.Scene {
   private createButton(x: number, y: number, label: string, cb: () => void, color = 0x4a3728): void {
     const bg = this.add.rectangle(x, y, 140, 26, color).setInteractive({ useHandCursor: true });
     bg.setStrokeStyle(1, 0x8b6914);
-    this.add
-      .text(x, y, label, {
-        fontFamily: 'monospace',
-        fontSize: '12px',
-        color: '#e0d0b0',
-      })
-      .setOrigin(0.5);
+    this.add.text(x, y, label, {
+      fontFamily: 'monospace', fontSize: '12px', color: '#e0d0b0',
+    }).setOrigin(0.5);
 
     bg.on('pointerdown', () => {
+      SoundManager.play('click');
       TelegramService.haptic('light');
       bg.setFillStyle(0x6b4f2a);
     });

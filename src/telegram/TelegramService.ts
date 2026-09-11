@@ -77,7 +77,7 @@ const MOCK_THEME: TelegramTheme = {
 };
 
 export class TelegramService {
-  private static webApp: typeof window.Telegram.WebApp | null = null;
+  private static webApp: NonNullable<NonNullable<typeof window.Telegram>['WebApp']> | null = null;
   private static isTelegram = false;
 
   static init(): void {

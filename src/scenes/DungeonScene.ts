@@ -33,22 +33,41 @@ export class DungeonScene extends Phaser.Scene {
 
     const floorDef = getFloor(this.state.currentFloor);
     this.cameras.main.setBackgroundColor(floorDef.backgroundColor);
+    this.cameras.main.fadeIn(280, 0, 0, 0);
+
+    if (this.textures.exists('tile_stone')) {
+      for (let tx = 0; tx < 30; tx++) {
+        for (let ty = 3; ty < 15; ty++) {
+          this.add.image(tx * 16 + 8, ty * 16 + 8, 'tile_stone').setAlpha(0.35).setDepth(-2);
+        }
+      }
+    }
+    this.add.rectangle(240, 8, 480, 20, 0x000000, 0.45).setDepth(50);
+    this.add.rectangle(240, 262, 480, 20, 0x000000, 0.35).setDepth(50);
+
+    for (let i = 0; i < 8; i++) {
+      const d = this.add.circle(Math.random() * 480, 40 + Math.random() * 180, 1, 0x8866aa, 0.25).setDepth(1);
+      this.tweens.add({
+        targets: d, y: d.y - 40, alpha: 0, duration: 3000 + Math.random() * 2000, repeat: -1, delay: i * 200,
+        onRepeat: () => { d.y = 60 + Math.random() * 160; d.x = Math.random() * 480; d.alpha = 0.3; },
+      });
+    }
 
     this.add.text(width / 2, 16, floorDef.name, {
       fontFamily: 'monospace', fontSize: '14px', color: '#c9a227',
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setDepth(60);
     this.add.text(10, 8, `Floor ${this.state.currentFloor}`, {
       fontFamily: 'monospace', fontSize: '10px', color: '#8888aa',
-    });
+    }).setDepth(60);
     this.add.text(width - 10, 8, `Gold: ${this.state.gold}`, {
       fontFamily: 'monospace', fontSize: '10px', color: '#ffd700',
-    }).setOrigin(1, 0);
+    }).setOrigin(1, 0).setDepth(60);
 
     this.statusText = this.add.text(10, 28, this.getStatusLine(), {
       fontFamily: 'monospace', fontSize: '10px', color: '#aaccaa',
-    });
+    }).setDepth(60);
 
-    this.choiceContainer = this.add.container(0, 0);
+    this.choiceContainer = this.add.container(0, 0).setDepth(20);
 
     this.createSmallButton(width - 50, height - 20, 'INV', () => {
       SoundManager.play('click');
@@ -106,9 +125,9 @@ export class DungeonScene extends Phaser.Scene {
     this.state.currentRoomIndex = room.index;
 
     const titles: Record<RoomType, string> = {
-      combat: '\u2694 Combat Room', elite: '\u2620 Elite Encounter', treasure: '\ud83d\udcb0 Treasure Chamber',
-      event: '? Strange Event', rest: '\ud83c\udfd5 Rest Site', shop: '\ud83d\uded2 Merchant',
-      secret: '\u2726 Hidden Room', boss: '\ud83d\udc51 BOSS ROOM',
+      combat: 'Combat Room', elite: 'Elite Encounter', treasure: 'Treasure Chamber',
+      event: 'Strange Event', rest: 'Rest Site', shop: 'Merchant',
+      secret: 'Hidden Room', boss: 'BOSS ROOM',
     };
     this.choiceContainer.add(
       this.add.text(width / 2, 70, titles[room.type] || room.type, {
@@ -131,7 +150,10 @@ export class DungeonScene extends Phaser.Scene {
       case 'combat': case 'elite': case 'boss': {
         const enemyIds = getEnemyIdsForRoom(this.state.currentFloor, type, this.state.dungeonSeed + room.index);
         saveManager.saveRun(this.state);
-        this.scene.start('BattleScene', { state: this.state, enemyIds, roomType: type });
+        this.cameras.main.fadeOut(180, 0, 0, 0);
+        this.time.delayedCall(200, () => {
+          this.scene.start('BattleScene', { state: this.state, enemyIds, roomType: type });
+        });
         break;
       }
       case 'treasure': this.doTreasure(); break;
@@ -292,5 +314,11 @@ export class DungeonScene extends Phaser.Scene {
     }).setOrigin(0.5));
     this.choiceContainer.add(this.createChoiceButton(width / 2, 190, 'TAKE', onClose));
     TelegramService.hapticSuccess();
+    this.tweens.add({
+      targets: this.choiceContainer,
+      scale: { from: 0.85, to: 1 },
+      duration: 220,
+      ease: 'Back.easeOut',
+    });
   }
 }

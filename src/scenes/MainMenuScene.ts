@@ -56,7 +56,7 @@ export class MainMenuScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     this.createButton(width / 2, 155, 'START RUN', () => this.startRun());
-    this.createButton(width / 2, 188, 'UPGRADES', () => this.showUpgrades());
+    this.createButton(width / 2, 188, 'UPGRADES', () => this.scene.start('UpgradesScene'));
     this.createButton(width / 2, 221, 'CODEX', () => {
       TelegramService.showAlert('Codex coming in v0.2');
     });
@@ -93,11 +93,5 @@ export class MainMenuScene extends Phaser.Scene {
     const state = createNewRunState(meta);
     saveManager.saveRun(state);
     this.scene.start('DungeonScene', { state });
-  }
-
-  private showUpgrades(): void {
-    const meta = saveManager.loadMeta();
-    const msg = `Soul Shards: ${meta.soulShards}\n\n+5% Starting HP (10 shards)\n+1 Starting Potion (15 shards)\n\n(Upgrades UI in progress)`;
-    TelegramService.showAlert(msg);
   }
 }

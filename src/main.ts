@@ -7,6 +7,7 @@ import { DungeonScene } from './scenes/DungeonScene';
 import { BattleScene } from './scenes/BattleScene';
 import { InventoryScene } from './scenes/InventoryScene';
 import { GameOverScene } from './scenes/GameOverScene';
+import { UpgradesScene } from './scenes/UpgradesScene';
 import { TelegramService } from './telegram/TelegramService';
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -32,6 +33,7 @@ const config: Phaser.Types.Core.GameConfig = {
     BattleScene,
     InventoryScene,
     GameOverScene,
+    UpgradesScene,
   ],
   input: {
     activePointers: 3,
@@ -42,4 +44,5 @@ TelegramService.init();
 
 const game = new Phaser.Game(config);
 (window as any).game = game;
+
 export default game;

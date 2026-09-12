@@ -28,6 +28,7 @@ export class BattleScene extends Phaser.Scene {
   menuButtons: Phaser.GameObjects.Container[] = [];
   fx!: BattleFX;
   juice!: SpriteJuice;
+  private barGfx: Phaser.GameObjects.Graphics | null = null;
 
   constructor() { super({ key: 'BattleScene' }); }
 
@@ -110,16 +111,43 @@ export class BattleScene extends Phaser.Scene {
   drawStatusBars(): void {
     this.hpTexts.forEach((t) => t.destroy());
     this.hpTexts = [];
+    if (this.barGfx) this.barGfx.destroy();
+    this.barGfx = this.add.graphics().setDepth(14);
+
     const p = this.player;
-    this.hpTexts.push(this.add.text(10, 178, `WARDEN  HP ${p.stats.hp}/${p.stats.maxHp}  MP ${p.stats.mp}/${p.stats.maxMp}`, {
+    const ph = Math.max(0, p.stats.hp / p.stats.maxHp);
+    this.barGfx.fillStyle(0x1a1a22, 1);
+    this.barGfx.fillRect(10, 192, 100, 6);
+    this.barGfx.fillStyle(ph > 0.3 ? 0x2ecc71 : 0xe74c3c, 1);
+    this.barGfx.fillRect(10, 192, 100 * ph, 6);
+    const pm = Math.max(0, p.stats.mp / Math.max(1, p.stats.maxMp));
+    this.barGfx.fillStyle(0x1a1a22, 1);
+    this.barGfx.fillRect(10, 200, 100, 4);
+    this.barGfx.fillStyle(0x3498db, 1);
+    this.barGfx.fillRect(10, 200, 100 * pm, 4);
+
+    this.hpTexts.push(this.add.text(10, 178, `WARDEN  ${p.stats.hp}/${p.stats.maxHp}  MP ${p.stats.mp}/${p.stats.maxMp}`, {
       fontFamily: 'monospace', fontSize: '10px', color: '#7dcea0',
     }).setDepth(15));
+
     this.enemies.forEach((e, i) => {
       if (!e.isAlive) return;
-      const br = e.maxBreakGauge > 0 ? ` BRK ${Math.ceil((e.breakGauge / e.maxBreakGauge) * 10)}` : '';
-      this.hpTexts.push(this.add.text(280, 28 + i * 18, `${e.name} ${e.stats.hp}/${e.stats.maxHp}${br}`, {
-        fontFamily: 'monospace', fontSize: '9px',
-        color: e.isBoss ? '#e74c3c' : e.isElite ? '#e67e22' : '#ecf0f1',
+      const y = 28 + i * 22;
+      const eh = Math.max(0, e.stats.hp / e.stats.maxHp);
+      this.barGfx!.fillStyle(0x1a1a22, 1);
+      this.barGfx!.fillRect(280, y + 10, 80, 5);
+      this.barGfx!.fillStyle(e.isBoss ? 0xc0392b : 0xe67e22, 1);
+      this.barGfx!.fillRect(280, y + 10, 80 * eh, 5);
+      if (e.maxBreakGauge > 0) {
+        const br = Math.max(0, e.breakGauge / e.maxBreakGauge);
+        this.barGfx!.fillStyle(0x1a1a22, 1);
+        this.barGfx!.fillRect(280, y + 16, 80, 3);
+        this.barGfx!.fillStyle(0xf1c40f, 1);
+        this.barGfx!.fillRect(280, y + 16, 80 * br, 3);
+      }
+      const col = e.isBoss ? '#e74c3c' : e.isElite ? '#e67e22' : '#ecf0f1';
+      this.hpTexts.push(this.add.text(280, y - 2, `${e.name} ${e.stats.hp}/${e.stats.maxHp}`, {
+        fontFamily: 'monospace', fontSize: '9px', color: col,
       }).setDepth(15));
     });
   }
